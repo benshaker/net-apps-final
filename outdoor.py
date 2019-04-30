@@ -32,7 +32,5 @@ def camera_stuff():
 		)
 		
 	
-	# check to see if there is an animal
-	# if there is, then send command to indoor pi
 	
 	
