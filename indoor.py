@@ -4,7 +4,7 @@
 from indoor_keys import CloudVisionKey
 import requests
 
-# example request below
+#   example request below
 #   note that content must be a base64 string
 #   starting with /9j/ or whatever
 
