@@ -5,7 +5,6 @@ import cv2
 import base64
 import picamera
 from flask import Flask, send_file, requests, jsonify
-from six import StringIO
 
 app = Flask(__name__)
 
@@ -26,9 +25,10 @@ STATE = 'off'
 COLOR = None
 INTENSITY = 0
 
-@app.route("/camera")
+NEED_TO_CAPTURE = False
+
+@app.route("/camera", methods=['POST'])
 def camera_stuff():
-	global CUR_IMG, PATH_TO_ENDPOINT
 	global NEED_TO_CAPTURE
 	
 	PATH_TO_ENDPOINT = ""
@@ -39,20 +39,11 @@ def camera_stuff():
 		ret, buf = cv2.imencode('.jpg', frame)
 		b64_jpg = base64.b64encode(buf)
 		cam.release()
-		#jsonify stuff
-		return make_response(jsonify(b64_jpg, 200))
-		'''cv2.imshow('frame', frame)
-		frame_im = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-		pil_im = Image.fromarray(frame_im)
-		stream = StringIO()
-		pil_im.save(stream, format="JPEG")
-		stream.seek(0)
-		CUR_IMG = stream.read()
-		files = {'image': CUR_IMG}
-		response = requests.post(
-			url = PATH_TO_ENDPOINT,
-			files=files
-		)'''
+		
+		request_body = '{"requests": [{"image": {"content": ' + b64_jpg + '}, "features": [{"type": "LABEL_DETECTION","maxResults": 1}]}]}'
+		
+		r = requests.post
+		return make_response(jsonify({'camera_image': b64_jpg}), 200)) 
 		
 def initializeLEDs():
     p.start(0)
@@ -212,7 +203,7 @@ def change_LED():
 
     global STATE, COLOR, INTENSITY
 
-    # at least one paramater is required
+    # at least one parameter is required
     newSTATE, newCOLOR, newINTENSITY = getLEDParams(request.args, request.json)
     if newSTATE or newCOLOR or newINTENSITY is not None:
         pass
