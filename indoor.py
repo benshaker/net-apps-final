@@ -193,13 +193,9 @@ def determineAction(labels):
     response_daytime = settings[2]['response_daytime']
     response_nighttime = settings[3]['response_nighttime']
 
-<<<<<<< HEAD
     for item in whitelist:
         if item in labels:
             return ("sound" : None, "light" : None)
-=======
-
->>>>>>> debd336f0e373ab31dac5791ef83a025c37af018
 
     for item in blacklist:
         if item in labels or (item + 's') in labels:
