@@ -32,24 +32,14 @@
             <h3>Whitelist.</h3>
 			<p>Modify your whitelist below. These are creatures you wish for Deer 'B' Gone to ignore.</p>
 			<br></br>
-			
 			<script>
-				var MongoClient = require('mongodb').MongoClient;
-				var url = "mongodb://localhost:27017/";
-				
-				MongoClient.connect(url, function(err, db) {
-					if (err) throw err;
-					var dbo = db.db("whitelist");
-					dbo.find({}, function(err, list_items) {
-						if (err) throw err;
-						var all_items = [];
-						for (var i=0; i<list_items.length;i++) {
-							all_items.push(JSON.parse(list_items[i]));
-						}
-						console.log('the items '+ all_items);
-						res.json(all_items);
-					});
-				});
+				const Http = new XMLHttpRequest();
+				const url='http://10.0.0.47:8080/load_settings';
+				Http.open("GET", url);
+				Http.send();
+				Http.onreadystatechange=(e)=>{
+					console.log(Http.responseText);
+				}
 			</script>
 			<h3>Blacklist.</h3>
 			<p>These are creatures you wish to scare away from your garden. They deserve no mercy.</p>
