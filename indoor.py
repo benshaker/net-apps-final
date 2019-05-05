@@ -15,7 +15,8 @@ from zeroconf import ServiceBrowser, Zeroconf
 from flask import Flask, jsonify, make_response, request, abort, render_template, Response
 from flask_scss import Scss
 import sass
-
+import argparse
+import sys
 import jsonpickle
 import numpy as np
 import cv2
@@ -31,6 +32,8 @@ Scss(app)
 sass.compile(dirname=('assets/scss', 'static/css'))
 # BEGIN APP
 
+IP = '127.0.0.1'
+PORT = 8080
 
 @app.route("/")
 def root_get():
@@ -163,12 +166,15 @@ def determineAction(labels):
     settings = coll.find({}, {'_id': False})
 
     settings = dumps(settings)
-    settings = ast.literal_eval(settings)[0]
+    settings = ast.literal_eval(settings)
 
-    whitelist = settings['whitelist']
-    blacklist = settings['blacklist']
-    response_daytime = settings['response_daytime']
-    response_nighttime = settings['response_nighttime']
+    # print(settings)
+    # print("settings")
+
+    whitelist = settings[0]['whitelist']
+    blacklist = settings[1]['blacklist']
+    response_daytime = settings[2]['response_daytime']
+    response_nighttime = settings[3]['response_nighttime']
 
     # return {"sound":"Grizzly.wav", "light":None}
     # return {"sound":"Hawk.wav", "light":None}
