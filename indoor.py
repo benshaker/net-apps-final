@@ -26,6 +26,8 @@ Scss(app)
 sass.compile(dirname=('assets/scss', 'static/css'))
 # BEGIN APP
 
+IP = '127.0.0.1'
+PORT = 8080
 
 @app.route("/")
 def root_get():
@@ -309,6 +311,25 @@ def not_found(error):
         'See /info'
     }), 404)
 
+def main(args):
+	global IP = args.ip_address
+	global PORT = args.flask_port
+	app.run(host='0.0.0.0', port=8080, debug=True)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
+	parser = argparse.ArgumentParser(description='Sends appropriate response to OutdoorPi given an image')
+	
+	parser.add_argument('--ip_address',
+						'-ip',
+						help="The IP address of the OutdoorPi",
+						type=str)
+						
+	parser.add_argument('--flask_port',
+						'-p',
+						help="The port number of the Flask server hosted by the OutdoorPi",
+						type=int)
+						
+	if len(sys.argv) != 5:
+		print("Error: Too few arguments provided. Please see --help for more information.")
+	else:
+		main(parser.parse_args(sys.argv[1:]))

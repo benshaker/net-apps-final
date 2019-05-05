@@ -37,13 +37,11 @@ def camera_stuff():
 		cam = cv2.VideoCapture(0)
 		ret, frame = cam.read()
 		ret, buf = cv2.imencode('.jpg', frame)
-		b64_jpg = base64.b64encode(buf)
 		cam.release()
 		
-		request_body = '{"requests": [{"image": {"content": ' + b64_jpg + '}, "features": [{"type": "LABEL_DETECTION","maxResults": 1}]}]}'
-		
-		r = requests.post
-		return make_response(jsonify({'camera_image': b64_jpg}), 200)) 
+		response = requests.post('http://10.0.0.47:8080/image', data=img_encoded.tostring(), headers=headers)
+
+		return make_response(jsonify(response.json()), 200)) 
 		
 def initializeLEDs():
     p.start(0)
