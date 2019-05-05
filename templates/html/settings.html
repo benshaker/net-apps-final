@@ -26,23 +26,29 @@
 
         <div class="container pt3 pb3">
 
-        <!-- Colors -->
-        <section class="pb4 align--center">
-            <h2 class="text--gray pb1 border--bottom">Colors</h2>
-            <div class="pt1 pb1 text--white bg--primary-color">Primary brand color</div>
-            <div class="pt1 pb1 text--white bg--secondary-color">Secondary brand color</div>
-            <div class="pt1 pb1 text--white bg--tertiary-color">Brand accent color</div>
-            <div class="pt1 pb1 text--white bg--darkest-gray">Darkest gray</div>
-            <div class="pt1 pb1 text--white bg--dark-gray">Dark gray</div>
-            <div class="pt1 pb1 text--white bg--gray">Gray</div>
-            <div class="pt1 pb1 text--white bg--light-gray">Light gray</div>
-            <div class="pt1 pb1 bg--lightest-gray">Lightest gray</div>
-        </section>
-
         <!-- Type -->
         <section class="pb4 reading-font">
-            <h2 class="text--gray pb1 border--bottom">Type</h2>
-            <h1>A new take on health care for small businesses.</h1>
+            <h2 class="text--gray pb1 border--bottom">Settings</h2>
+            <h1>Whitelist.</h1>
+			<script type="text/javascript" src="{{url_for('static', filename='js/r.js') }}"></script>
+			<script>
+				var MongoClient = require('mongodb').MongoClient;
+				var url = "mongodb://localhost:27017/";
+				
+				MongoClient.connect(url, function(err, db) {
+					if (err) throw err;
+					var dbo = db.db("whitelist");
+					dbo.find({}, function(err, list_items) {
+						if (err) throw err;
+						var all_items = [];
+						for (var i=0; i<list_items.length;i++) {
+							all_items.push(JSON.parse(list_items[i]));
+						}
+						console.log('the items '+ all_items);
+						res.json(all_items);
+					});
+				});
+			</script>
             <h2>Heading 2</h2>
             <h3>Heading 3</h3>
             <h4>Heading 4</h4>
