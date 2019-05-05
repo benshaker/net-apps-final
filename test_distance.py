@@ -46,5 +46,5 @@ def getDist(TRIG, ECHO):
 
 while True:
     print(getDist(rTRIG, rECHO))
-    print(getDist(lTRIG, lECHO))
+    print(getDist(rTRIG, rECHO))
     # getDist(rTRIG, rECHO)

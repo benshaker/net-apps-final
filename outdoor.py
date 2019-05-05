@@ -1,48 +1,36 @@
 #!/usr/bin/env python3
 # outdoor.py
 
+import os
 import cv2
 import base64
-import picamera
-from flask import Flask, send_file, requests, jsonify
-
-app = Flask(__name__)
+import RPi.GPIO as GPIO
+import time
 
 # Suppress Warnings
 GPIO.setwarnings(False)
 
+# Ports used for proximity sensors
+rTRIG = 8
+rECHO = 10
+lTRIG = 16
+lECHO = 18
+
 # setup pins
 GPIO.setmode(GPIO.BOARD)
+GPIO.setup(rTRIG, GPIO.OUT)
+GPIO.setup(rECHO, GPIO.IN)
+GPIO.setup(lTRIG, GPIO.OUT)
+GPIO.setup(lECHO, GPIO.IN)
 GPIO.setup(11, GPIO.OUT)  # Red
 GPIO.setup(13, GPIO.OUT)  # Green
 GPIO.setup(15, GPIO.OUT)  # Blue
+GPIO.output(rTRIG, GPIO.LOW)
+GPIO.output(lTRIG, GPIO.LOW)
 p = GPIO.PWM(11, 100)
 w = GPIO.PWM(13, 100)
 m = GPIO.PWM(15, 100)
 
-# Info
-STATE = 'off'
-COLOR = None
-INTENSITY = 0
-
-NEED_TO_CAPTURE = False
-
-@app.route("/camera", methods=['POST'])
-def camera_stuff():
-	global NEED_TO_CAPTURE
-	
-	PATH_TO_ENDPOINT = ""
-	
-	if NEED_TO_CAPTURE:
-		cam = cv2.VideoCapture(0)
-		ret, frame = cam.read()
-		ret, buf = cv2.imencode('.jpg', frame)
-		cam.release()
-		
-		response = requests.post('http://10.0.0.47:8080/image', data=img_encoded.tostring(), headers=headers)
-
-		return make_response(jsonify(response.json()), 200)) 
-		
 def initializeLEDs():
     p.start(0)
     w.start(0)
@@ -57,91 +45,82 @@ def resetFrequency():
 
 def setLEDW():
     # white LED - Waiting for command
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY)
-    w.ChangeDutyCycle(INTENSITY)
-    m.ChangeDutyCycle(INTENSITY)
+    p.ChangeDutyCycle(100)
+    w.ChangeDutyCycle(100)
+    m.ChangeDutyCycle(100)
 
 
 def setLEDR():
     # red LED
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY)
+    p.ChangeDutyCycle(100)
     w.ChangeDutyCycle(0)
     m.ChangeDutyCycle(0)
 
 
 def setLEDG():
     # green LED
-    global INTENSITY
     resetFrequency()
     p.ChangeDutyCycle(0)
-    w.ChangeDutyCycle(INTENSITY)
+    w.ChangeDutyCycle(100)
     m.ChangeDutyCycle(0)
 
 
 def setLEDB():
     # blue LED
-    global INTENSITY
+    global 100
     resetFrequency()
     p.ChangeDutyCycle(0)
     w.ChangeDutyCycle(0)
-    m.ChangeDutyCycle(INTENSITY)
+    m.ChangeDutyCycle(100)
 
 
 def setLEDM():
     # magenta LED
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY)
+    p.ChangeDutyCycle(100)
     w.ChangeDutyCycle(0)
-    m.ChangeDutyCycle(INTENSITY)
+    m.ChangeDutyCycle(100)
 
 
 def setLEDC():
     # cyan LED
-    global INTENSITY
     resetFrequency()
     p.ChangeDutyCycle(0)
-    w.ChangeDutyCycle(INTENSITY)
-    m.ChangeDutyCycle(INTENSITY)
+    w.ChangeDutyCycle(100)
+    m.ChangeDutyCycle(100)
 
 
 def setLEDY():
     # yellow LED
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY)
-    w.ChangeDutyCycle(INTENSITY)
+    p.ChangeDutyCycle(100)
+    w.ChangeDutyCycle(100)
     m.ChangeDutyCycle(0)
 
 
 def setLEDO():
     # orange LED
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY)
-    w.ChangeDutyCycle(INTENSITY*.25)
+    p.ChangeDutyCycle(100)
+    w.ChangeDutyCycle(25)
     m.ChangeDutyCycle(0)
 
 
 def setLEDP():
     # purple LED
-    global INTENSITY
     resetFrequency()
-    p.ChangeDutyCycle(INTENSITY*.33)
+    p.ChangeDutyCycle(33)
     w.ChangeDutyCycle(0)
-    m.ChangeDutyCycle(INTENSITY)
+    m.ChangeDutyCycle(100)
 
 
 def setLEDDisco():
     # disco LED
-    global INTENSITY
-    p.ChangeDutyCycle(INTENSITY)
-    w.ChangeDutyCycle(INTENSITY)
-    m.ChangeDutyCycle(INTENSITY)
+    p.ChangeDutyCycle(100)
+    w.ChangeDutyCycle(100)
+    m.ChangeDutyCycle(100)
 
     p.ChangeFrequency(2)
     w.ChangeFrequency(4)
@@ -156,144 +135,84 @@ def setLEDOFF():
     m.ChangeDutyCycle(0)
 
 
-@app.route("/LED/info", methods=['GET'])
-def send_info():
-    global STATE, COLOR, INTENSITY
-
-    info = {
-        'status': STATE,
-        'color': COLOR,
-        'intensity': str(INTENSITY)
-    }
-    return jsonify(info), 200
-
-
-def LED_Branch():
-    global COLOR
-
-    if COLOR == 'white':
+def change_LED(COLOR):
+        
+    if COLOR == 'White':
         setLEDW()
-    elif COLOR == 'red':
+    elif COLOR == 'Red':
         setLEDR()
-    elif COLOR == 'green':
+    elif COLOR == 'Green':
         setLEDG()
-    elif COLOR == 'blue':
+    elif COLOR == 'Blue':
         setLEDB()
-    elif COLOR == 'cyan':
+    elif COLOR == 'Cyan':
         setLEDC()
-    elif COLOR == 'magenta':
+    elif COLOR == 'Magenta':
         setLEDM()
-    elif COLOR == 'yellow':
+    elif COLOR == 'Yellow':
         setLEDY()
-    elif COLOR == 'orange':
+    elif COLOR == 'Orange':
         setLEDO()
-    elif COLOR == 'purple':
+    elif COLOR == 'Purple':
         setLEDP()
-    elif COLOR == 'disco':
+    elif COLOR == 'Disco':
         setLEDDisco()
-    else:
-        return make_response(jsonify({
-                'error': 'Invalid color requested'}), 404)
 
 
-@app.route("/LED/change", methods=['PUT'])
-def change_LED():
+def make_noise(SOUND):
 
-    global STATE, COLOR, INTENSITY
-
-    # at least one parameter is required
-    newSTATE, newCOLOR, newINTENSITY = getLEDParams(request.args, request.json)
-    if newSTATE or newCOLOR or newINTENSITY is not None:
-        pass
-    else:
-        return make_response(jsonify({
-            'error': '/LED/change requires at least one param.'}), 400)
-
-    # LED should turn to ON from OFF
-    if newSTATE == 'on' and STATE == 'off':
-        STATE = newSTATE
-        if newINTENSITY is not None:
-            INTENSITY = newINTENSITY
-        else:
-            INTENSITY = 100
-        if newCOLOR is not None:
-            COLOR = newCOLOR
-        else:
-            COLOR = 'white'
-        LED_Branch()
-    # LED should stay ON
-    elif newSTATE == 'on' and STATE == 'on':
-        if newINTENSITY is not None:
-            INTENSITY = newINTENSITY
-        if newCOLOR is not None:
-            COLOR = newCOLOR
-        LED_Branch()
-    # LED should turn OFF
-    elif newSTATE == 'off':
-        STATE = 'off'
-        INTENSITY = 0
-        COLOR = None
-        setLEDOFF()
-    # LED state was not provided
-    elif newSTATE is None:
-        if STATE == 'on':
-            pass
-        elif STATE == 'off':
-            return make_response(jsonify({
-                'error': 'LED cannot be updated in an \'off\' state'}), 400)
-
-        if newINTENSITY is not None:
-            INTENSITY = newINTENSITY
-        if newCOLOR is not None:
-            COLOR = newCOLOR
-        LED_Branch()
-    else:
-        return make_response(jsonify({
-            'error': 'Invalid combination attempted'}), 400)
-
-    return make_response(jsonify({
-        'success': 'LED updated successfully'}), 200)
+    if SOUND != None:
+        os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp ' + SOUND)
 
 
-# this is a helper function that extracts query params
-# from the Service RPi's request for use in LED update
-def getLEDParams(args, json):
-    status = None
-    if not args or 'status' not in args:
-        if not json or 'status' not in json:
-            pass
-        else:
-            status = json['status']
-    else:
-        status = args['status']
+def getDist(TRIG, ECHO):
+    # Repsonse of 10000 means the sensor did not read correctly
+    # Occurs when the pulse returns before the echo is read
+        
+    GPIO.output(TRIG, GPIO.HIGH)
+    time.sleep(0.00001)
+    GPIO.output(TRIG, GPIO.LOW)
 
-    color = None
-    if not args or 'color' not in args:
-        if not json or 'color' not in json:
-            pass
-        else:
-            color = json['color']
-    else:
-        color = args['color']
+    start_time = time.time()
 
-    intensity = None
-    if not args or 'intensity' not in args:
-        if not json or 'intensity' not in json:
-            pass
-        else:
-            intensity = json['intensity']
-    else:
-        intensity = args['intensity']
+    while GPIO.input(ECHO)==0:
+        pulse_start_time = time.time()
+        if pulse_start_time - start_time > 1:
+            return 10000
 
-    if intensity is not None:
-        intensity = int(intensity)
+    while GPIO.input(ECHO)==1:
+        pulse_end_time = time.time()
+        if pulse_end_time - pulse_start_time > 1:
+            return 10000
+    try:
+         pulse_duration = pulse_end_time - pulse_start_time
+    except:
+         return 10000
+    Dist = round(pulse_duration * 17150, 2)
 
-    return status, color, intensity
+    return Dist
+
+
+def captureNscare():
+    global NEED_TO_CAPTURE
+	
+    PATH_TO_ENDPOINT = ""
+	
+    if NEED_TO_CAPTURE:
+        cam = cv2.VideoCapture(0)
+        ret, frame = cam.read()
+        ret, buf = cv2.imencode('.jpg', frame)
+        cam.release()
+
+        response = requests.post('http://10.0.0.47:8080/image', data=img_encoded.tostring(), headers=headers)
+
+        change_LED(response.json['light'])
+        make_noise(response.json['sound'])
 
 
 if __name__ == "__main__":
     initializeLEDs()
-    app.run(host='0.0.0.0', port=8080, debug=False)
 
-	
-	
+    while True:
+        if getDist(rTRIG, rECHO) < 50 || getDist(lTRIG, LECHO) < 50:
+            captureNscare()
