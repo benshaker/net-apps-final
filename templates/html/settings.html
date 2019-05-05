@@ -29,8 +29,10 @@
         <!-- Type -->
         <section class="pb4 reading-font">
             <h2 class="text--gray pb1 border--bottom">Settings</h2>
-            <h1>Whitelist.</h1>
-			<script type="text/javascript" src="{{url_for('static', filename='js/r.js') }}"></script>
+            <h3>Whitelist.</h3>
+			<p>Modify your whitelist below. These are creatures you wish for Deer 'B' Gone to ignore.</p>
+			<br></br>
+			
 			<script>
 				var MongoClient = require('mongodb').MongoClient;
 				var url = "mongodb://localhost:27017/";
@@ -49,29 +51,16 @@
 					});
 				});
 			</script>
-            <h2>Heading 2</h2>
-            <h3>Heading 3</h3>
-            <h4>Heading 4</h4>
-            <h5>Heading 5</h5>
-            <h6>Heading 6</h6>
-            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, semper suscipit, posuere a, pede.</p>
-            <p>Sed adipiscing ornare risus. Morbi est est, blandit sit amet, sagittis vel, euismod vel, velit. Pellentesque egestas sem. Suspendisse commodo ullamcorper magna. Ut aliquam sollicitudin leo.</p>
-            <blockquote class="blockquote">This is a blockquote. Suspendisse commodo ullamcorper magna.</blockquote>
-            <p>Lorem <sup>superscript</sup> dolor <sub>subscript</sub> amet, consectetuer adipiscing elit. Nullam dignissim convallis est. Quisque aliquam. <cite>cite</cite>. Donec sed tellus eget sapien fringilla nonummy. <acronym title="National Basketball Association">NBA</acronym> Morbi imperdiet augue quis tellus. Suspendisse quam sem, <abbr title="Avenue">AVE</abbr> consequat at, commodo vitae, feugiat in nunc.</p>
-            <p>Morbi in sem quis dui <a class="link" href="#">placerat ornare</a>. Pellentesque odio nisi, euismod in <a class="link" href="#">pharetra</a> a, ultricies in, diam. Sed arcu. Cras consequat.</p>
-            <ul class="list--indented">
-                <li>Aliquam tincidunt mauris eu risus.</li>
-                <li>Vestibulum auctor dapibus neque.</li>
-                <li>Nunc dignissim risus id metus.</li>
-                <li>Vivamus vestibulum nulla nec ante.</li>
-            </ul>
-            <p>Morbi in sem quis dui placerat ornare. Pellentesque odio nisi, euismod in, pharetra a, ultricies in, diam. Sed arcu. Cras consequat.</p>
-            <ol class="list--indented m0">
-                <li>Integer vitae libero ac risus egestas placerat.</li>
-                <li>Praesent placerat risus quis eros.</li>
-                <li>Ut aliquam sollicitudin leo.</li>
-                <li>Donec quis dui at dolor tempor interdum.</li>
-            </ol>
+			<h3>Blacklist.</h3>
+			<p>These are creatures you wish to scare away from your garden. They deserve no mercy.</p>
+			<br></br>
+			
+			<h3>Daytime Responses.</h3> <!-- should be drop downs -->
+			<p>These are all sound-based responses to the animals on the blacklist. If none are specified, the default is "Get off my lawn".</p><br></br>
+			
+			<h3>Nighttime Responses.</h3> <!-- should be drop downs -->
+			<p>These are all light-based responses to the animals on the blacklist. If none are specified, the default is "Disco".</p><br></br>
+			
         </section>
 
         <!-- Forms -->
