@@ -195,19 +195,19 @@ def determineAction(labels):
 
     for item in whitelist:
         if item in labels:
-            return ("sound" : None, "light" : None)
+            return {"sound" : None, "light" : None}
 
     for item in blacklist:
         if item in labels or (item + 's') in labels:
             if nighttime:
-                return ("sound" : None, "light" : response_nighttime[item])
+                return {"sound" : None, "light" : response_nighttime[item]}
             else:
-                return ("sound" : response_daytime[item], "light" : None)
+                return {"sound" : response_daytime[item], "light" : None}
 
     if nighttime:
-        return ("sound" : None, "light" : response_nighttime[default])
+        return {"sound" : None, "light" : response_nighttime[default]}
     else:
-        return ("sound" : response_daytime[default], "light" : None)
+        return {"sound" : response_daytime[default], "light" : None}
 
 
 # this is a helper function that handles blanket 404 errors
