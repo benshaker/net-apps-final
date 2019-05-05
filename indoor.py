@@ -92,6 +92,14 @@ def save_settings_put():
   return make_response(jsonify(action), 200)
 
 
+@app.route("/load_history", methods=['GET'])
+def load_history_get():
+	col = db.getHistory()
+	hist = col.find({}, {'_id': False})
+	
+	hist = dumps(hist)
+	return make_response(hist, 201)
+	
 @app.route("/image", methods=['POST'])
 def image_post():
     r = request
@@ -218,8 +226,16 @@ class HistoryDB(object):
         self._client = pymongo.MongoClient("mongodb://localhost:27017/")
         self._db = self._client.scarecrow
         self.history_collection = self._db.history
+        post = {
+		"animal_detected": "deer",
+		"time_of_occurrence": "11:11",
+		"action_sound": "Bear.wav",
+		"action_light": "Green"
+		}
+		
+        post_id = self.history_collection.insert_one(post).inserted_id
         self.settings_collection = self._db.settings
-
+    
     def getHistory(self):
         return self.history_collection
 
@@ -229,4 +245,5 @@ class HistoryDB(object):
 
 if __name__ == "__main__":
     db = HistoryDB()
+	
     app.run(host='0.0.0.0', port=8080, debug=True)
