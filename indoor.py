@@ -2,37 +2,27 @@
 # services.py
 #
 from indoor_keys import CloudVisionKey
-import requests
-
 import json
 import pymongo
 import requests
-
 from pymongo import UpdateOne
-from socket import inet_ntoa
 from six.moves import input
-from zeroconf import ServiceBrowser, Zeroconf
-from flask import Flask, jsonify, make_response, request, abort, render_template, Response
+from flask import Flask, jsonify, make_response, request, render_template
 import sass
-import argparse
-import sys
-import jsonpickle
 import numpy as np
 import cv2
 import base64
-import re
-
 import time
-
 from bson.json_util import dumps
 import ast
+import re
 
 app = Flask(__name__)
 sass.compile(dirname=('assets/scss', 'static/css'))
 # BEGIN APP
 
-IP = 'localhost'
-PORT = 8080
+# IP = 'localhost'
+# PORT = 8080
 
 @app.route("/")
 def root_get():
@@ -77,17 +67,24 @@ def save_settings_put():
   r = request.data.decode("utf-8")
   r = json.loads(r)
 
+  settings = db.getSettings()
   operations = []
   for ob in r["data"]:
+    # name = ob.pop('name')
     print(ob)
-    operations.append(
-        UpdateOne({"name": ob['name']},
-              {"$set": ob},
-              upsert=False)
-        )
+    settings.find_one_and_update({"name": ob['name']},
+                                 {"$set": ob})
+    # settings.replace_one({'name':ob['name']},
+    #                              ob,
+    #                              True)
 
-  settings = db.getSettings()
-  settings.bulk_write(operations)
+  #   print(ob)
+  #   # print(type(json.loads(ob)))
+  #   operations.append(
+  #       UpdateOne({"name": name},
+  #             {"$set": ob})
+  #       )
+  # settings.bulk_write(operations)
 
   action = {"success":"woohoo!!1"}
   return make_response(jsonify(action), 200)
@@ -97,10 +94,24 @@ def save_settings_put():
 def load_history_get():
 	col = db.getHistory()
 	hist = col.find({}, {'_id': False})
-	
+
 	hist = dumps(hist)
 	return make_response(hist, 201)
-	
+
+def add_to_history(data):
+    animal, time, sound, light = data
+    history = db.getHistory()
+
+    post = {
+        "animal_detected": animal,
+        "time_of_occurrence": time,
+        "action_sound": sound,
+        "action_light": light
+    }
+
+    history.insert_one(post)
+    return
+
 @app.route("/image", methods=['POST'])
 def image_post():
     r = request
@@ -163,8 +174,8 @@ def image_post():
         action = {"sound":None, "light":None}
     else:
         action = determineAction(labels)
-    print("HERE")
-    print(action)
+    # print("HERE")
+    # print(action)
 
     return make_response(jsonify(action), 201)
 
@@ -184,9 +195,9 @@ def determineAction(labels):
     mytime = time.localtime()
 
     if mytime.tm_hour < 6 or mytime.tm_hour > 18:
-        nighttime = True
-    else:
         nighttime = False
+    else:
+        nighttime = True
 
     coll = db.getSettings()
     settings = coll.find({}, {'_id': False})
@@ -198,24 +209,45 @@ def determineAction(labels):
 
     whitelist = settings[0]['whitelist']
     blacklist = settings[1]['blacklist']
-    response_daytime = settings[2]['response_daytime']
-    response_nighttime = settings[3]['response_nighttime']
+    response_daytime = settings[2]['daytime']
+    response_nighttime = settings[3]['nighttime']
+
+    print(whitelist)
+    print(blacklist)
+    print(response_daytime)
+    print(response_nighttime)
+    print("labels",labels)
+
+    # re.sub(r'\W+', '', whitelist)
+    # re.sub(r'\W+', '', blacklist)
 
     for item in whitelist:
         if item in labels:
-            return {"sound" : None, "light" : None}
+            action = {"sound" : None, "light" : None}
 
+    known_animal = False
+    animal = None
     for item in blacklist:
         if item in labels or (item + 's') in labels:
+            known_animal = True
+            animal = item
             if nighttime:
-                return {"sound" : None, "light" : response_nighttime[item]}
+                action = {"sound" : None, "light" : response_nighttime[item]}
             else:
-                return {"sound" : response_daytime[item], "light" : None}
+                action = {"sound" : response_daytime[item], "light" : None}
 
-    if nighttime:
-        return {"sound" : None, "light" : response_nighttime[default]}
-    else:
-        return {"sound" : response_daytime[default], "light" : None}
+    if not known_animal:
+        item = "default"
+        animal = item
+        if nighttime:
+            action = {"sound" : None, "light" : response_nighttime[item]}
+        elif not nighttime:
+            action = {"sound" : response_daytime[item], "light" : None}
+
+    event = animal, mytime, action["sound"], action["light"]
+    add_to_history(event)
+
+    return action
 
 
 # this is a helper function that handles blanket 404 errors
@@ -234,16 +266,8 @@ class HistoryDB(object):
         self._client = pymongo.MongoClient("mongodb://localhost:27017/")
         self._db = self._client.scarecrow
         self.history_collection = self._db.history
-        post = {
-		"animal_detected": "deer",
-		"time_of_occurrence": "11:11",
-		"action_sound": "Bear.wav",
-		"action_light": "Green"
-		}
-		
-        post_id = self.history_collection.insert_one(post).inserted_id
         self.settings_collection = self._db.settings
-    
+
     def getHistory(self):
         return self.history_collection
 
@@ -253,5 +277,4 @@ class HistoryDB(object):
 
 if __name__ == "__main__":
     db = HistoryDB()
-	
     app.run(host='0.0.0.0', port=8080, debug=True)

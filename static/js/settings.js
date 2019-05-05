@@ -12,8 +12,8 @@
     console.log(res_arr[1]["blacklist"])
     console.log(res_arr[2]["daytime"])
     console.log(res_arr[3]["nighttime"])
-    whitelist = JSON.stringify(res_arr[0]["whitelist"]);
-    blacklist = JSON.stringify(res_arr[1]["blacklist"]);
+    whitelist = res_arr[0]["whitelist"];
+    blacklist = res_arr[1]["blacklist"];
     daytime   = JSON.stringify(res_arr[2]["daytime"]);
     nighttime = JSON.stringify(res_arr[3]["nighttime"]);
 
