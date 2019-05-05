@@ -150,6 +150,9 @@ def change_LED(COLOR):
     elif COLOR == 'purple':
         setLEDP()
 
+    time.sleep(5)
+    setLEDOFF()
+
 
 def make_noise(SOUND):
 
