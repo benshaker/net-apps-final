@@ -8,11 +8,13 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Carta</title>
+        <title>Deer-B-Gone | Settings</title>
         <meta name="description" content="">
 
         <!-- The compiled CSS file -->
         <link rel="stylesheet" href="/static/css/main.css">
+        <script type=text/javascript src="{{
+            url_for('static', filename='js/main.js') }}"></script>
 
         <!-- Web fonts -->
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700|Source+Serif+Pro:700" rel="stylesheet">
@@ -29,56 +31,31 @@
         <!-- Type -->
         <section class="pb4 reading-font">
             <h2 class="text--gray pb1 border--bottom">Settings</h2>
+            <br />
             <h3>Whitelist.</h3>
 			<p>Modify your whitelist below. These are creatures you wish for Deer 'B' Gone to ignore.</p>
-			<br></br>
-			<script>
-				const Http = new XMLHttpRequest();
-				const url='http://10.0.0.47:8080/load_settings';
-				Http.open("GET", url);
-				Http.send();
-				Http.onreadystatechange=(e)=>{
-					console.log(Http.responseText);
-				}
-			</script>
+			<input class="form-control mb1" type="text" placeholder="Whitelist" id="white">
+            <br>
+
 			<h3>Blacklist.</h3>
 			<p>These are creatures you wish to scare away from your garden. They deserve no mercy.</p>
-			<br></br>
-			
+            <input class="form-control mb1" type="text" placeholder="Blacklist" id="black">
+			<br>
+
 			<h3>Daytime Responses.</h3> <!-- should be drop downs -->
-			<p>These are all sound-based responses to the animals on the blacklist. If none are specified, the default is "Get off my lawn".</p><br></br>
-			
+			<p>These are all sound-based responses to the animals on the blacklist. If none are specified, the default is "Get off my lawn".</p>
+            <input class="form-control mb1" type="text" placeholder="Daytime Responses" id="day">
+            <br>
+
 			<h3>Nighttime Responses.</h3> <!-- should be drop downs -->
-			<p>These are all light-based responses to the animals on the blacklist. If none are specified, the default is "Disco".</p><br></br>
-			
-        </section>
+			<p>These are all light-based responses to the animals on the blacklist. If none are specified, the default is "Disco".</p>
+            <input class="form-control mb1" type="text" placeholder="Nighttime Responses"  id="night">
+            <br>
 
-        <!-- Forms -->
-        <section class="pb4">
-            <h2 class="text--gray pb1 border--bottom">Forms</h2>
-            <form class="form">
-                <input class="form-control mb1" type="text" placeholder="Name">
-                <input class="form-control mb1" type="email" placeholder="Email Address">
-                <input class="form-control mb1" type="subject" placeholder="Subject">
-                <div class="select mb1">
-                    <select>
-                        <option selected>Open this select</option>
-                        <option>One</option>
-                        <option>Two</option>
-                        <option>Three</option>
-                    </select>
-                </div>
-                <textarea class="form-control mb1" placeholder="Message"></textarea>
-                <button class="btn btn--default">Default</button>
-            </form>
-        </section>
+            <button class="btn btn--default" id="save">
+                Save Settings
+            </button>
 
-        <!-- Buttons -->
-        <section class="pb4">
-            <h2 class="text--gray pb1 border--bottom">Buttons</h2>
-            <a class="btn btn--default" href="">Medium Default</a>
-            <a class="btn btn--outline" href="">Medium Outline</a>
-            <a class="btn btn--default btn--sm" href="">Small Default</a>
         </section>
 
         </div> <!-- End container -->
