@@ -153,8 +153,9 @@ def change_LED(COLOR):
 
 def make_noise(SOUND):
 
+    print(SOUND)
     if SOUND != None:
-        os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp ' + SOUND)
+        os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp ' + SOUND + '.wav')
 
 
 def getDist(TRIG, ECHO):
