@@ -214,5 +214,5 @@ if __name__ == "__main__":
     initializeLEDs()
 
     while True:
-        if getDist(rTRIG, rECHO) < 50 || getDist(lTRIG, LECHO) < 50:
+        if getDist(rTRIG, rECHO) < 20 || getDist(lTRIG, LECHO) < 20:
             captureNscare()
