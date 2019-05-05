@@ -8,10 +8,14 @@
 
   function reqListener () {
     res_arr   = JSON.parse(this.responseText);
-    whitelist = res_arr[0]["whitelist"].toString();
-    blacklist = res_arr[1]["blacklist"].toString();
-    daytime   = res_arr[2]["response_daytime"].toString();
-    nighttime = res_arr[3]["response_nighttime"].toString();
+    console.log(res_arr[0]["whitelist"])
+    console.log(res_arr[1]["blacklist"])
+    console.log(res_arr[2]["daytime"])
+    console.log(res_arr[3]["nighttime"])
+    whitelist = JSON.stringify(res_arr[0]["whitelist"]);
+    blacklist = JSON.stringify(res_arr[1]["blacklist"]);
+    daytime   = JSON.stringify(res_arr[2]["daytime"]);
+    nighttime = JSON.stringify(res_arr[3]["nighttime"]);
 
     document.getElementById("white").value = whitelist;
     document.getElementById("black").value = blacklist;
@@ -32,10 +36,10 @@
       blacklist = {"blacklist":blacklist, "name":"black"}
       // console.log(blacklist)
       daytime   = document.getElementById("day").value.split(",");
-      daytime = {"daytime":daytime, "name":"day"}
+      daytime = {"daytime":JSON.parse(daytime), "name":"day"}
       // console.log(daytime)
       nighttime = document.getElementById("night").value.split(",");
-      nighttime = {"nighttime":nighttime, "name":"night"}
+      nighttime = {"nighttime":JSON.parse(nighttime), "name":"night"}
       // console.log(nighttime)
 
       data = {'data': [whitelist, blacklist, daytime, nighttime]}
