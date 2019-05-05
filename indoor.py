@@ -13,7 +13,6 @@ from socket import inet_ntoa
 from six.moves import input
 from zeroconf import ServiceBrowser, Zeroconf
 from flask import Flask, jsonify, make_response, request, abort, render_template, Response
-from flask_scss import Scss
 import sass
 import argparse
 import sys
@@ -29,7 +28,6 @@ from bson.json_util import dumps
 import ast
 
 app = Flask(__name__)
-Scss(app)
 sass.compile(dirname=('assets/scss', 'static/css'))
 # BEGIN APP
 
@@ -67,12 +65,32 @@ def root_info_get():
 
 @app.route("/load_settings", methods=['GET'])
 def load_settings_get():
-  coll = historical.getSettings()
+  coll = db.getSettings()
   settings = coll.find({}, {'_id': False})
 
   settings = dumps(settings)
   # action = {"success":"woohoo!!1"}
   return make_response(settings, 201)
+
+@app.route("/save_settings", methods=['PUT'])
+def save_settings_put():
+  r = request.data.decode("utf-8")
+  r = json.loads(r)
+
+  operations = []
+  for ob in r["data"]:
+    print(ob)
+    operations.append(
+        UpdateOne({"name": ob['name']},
+              {"$set": ob},
+              upsert=False)
+        )
+
+  settings = db.getSettings()
+  settings.bulk_write(operations)
+
+  action = {"success":"woohoo!!1"}
+  return make_response(jsonify(action), 200)
 
 
 @app.route("/image", methods=['POST'])
@@ -162,9 +180,8 @@ def determineAction(labels):
     else:
         nighttime = False
 
-    coll = historical.getSettings()
+    coll = db.getSettings()
     settings = coll.find({}, {'_id': False})
-
     settings = dumps(settings)
     settings = ast.literal_eval(settings)
 
@@ -176,9 +193,13 @@ def determineAction(labels):
     response_daytime = settings[2]['response_daytime']
     response_nighttime = settings[3]['response_nighttime']
 
+<<<<<<< HEAD
     for item in whitelist:
         if item in labels:
             return ("sound" : None, "light" : None)
+=======
+
+>>>>>>> debd336f0e373ab31dac5791ef83a025c37af018
 
     for item in blacklist:
         if item in labels or (item + 's') in labels:
@@ -219,5 +240,5 @@ class HistoryDB(object):
 
 
 if __name__ == "__main__":
-    historical = HistoryDB()
+    db = HistoryDB()
     app.run(host='0.0.0.0', port=8080, debug=True)
