@@ -312,8 +312,10 @@ def not_found(error):
     }), 404)
 
 def main(args):
-	global IP = args.ip_address
-	global PORT = args.flask_port
+	global IP
+	global PORT
+	IP = args.ip_address
+	PORT = args.flask_port
 	app.run(host='0.0.0.0', port=8080, debug=True)
 
 if __name__ == "__main__":
