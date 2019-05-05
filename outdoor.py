@@ -4,8 +4,10 @@
 import os
 import cv2
 import base64
+import numpy as np
 import RPi.GPIO as GPIO
 import time
+import requests
 
 # Suppress Warnings
 GPIO.setwarnings(False)
@@ -30,6 +32,10 @@ GPIO.output(lTRIG, GPIO.LOW)
 p = GPIO.PWM(11, 100)
 w = GPIO.PWM(13, 100)
 m = GPIO.PWM(15, 100)
+
+# prepare headers for http request
+content_type = 'image/jpeg'
+headers = {'content-type': content_type}
 
 def initializeLEDs():
     p.start(0)
@@ -69,7 +75,6 @@ def setLEDG():
 
 def setLEDB():
     # blue LED
-    global 100
     resetFrequency()
     p.ChangeDutyCycle(0)
     w.ChangeDutyCycle(0)
@@ -136,25 +141,27 @@ def setLEDOFF():
 
 
 def change_LED(COLOR):
-        
-    if COLOR == 'white':
+
+    if COLOR == 'White':
         setLEDW()
-    elif COLOR == 'red':
+    elif COLOR == 'Red':
         setLEDR()
-    elif COLOR == 'green':
+    elif COLOR == 'Green':
         setLEDG()
-    elif COLOR == 'blue':
+    elif COLOR == 'Blue':
         setLEDB()
-    elif COLOR == 'cyan':
+    elif COLOR == 'Cyan':
         setLEDC()
-    elif COLOR == 'magenta':
+    elif COLOR == 'Magenta':
         setLEDM()
-    elif COLOR == 'yellow':
+    elif COLOR == 'Yellow':
         setLEDY()
-    elif COLOR == 'orange':
+    elif COLOR == 'Orange':
         setLEDO()
-    elif COLOR == 'purple':
+    elif COLOR == 'Purple':
         setLEDP()
+    elif COLOR == 'Disco':
+        setLEDDisco()
 
 
 def make_noise(SOUND):
@@ -166,7 +173,7 @@ def make_noise(SOUND):
 def getDist(TRIG, ECHO):
     # Repsonse of 10000 means the sensor did not read correctly
     # Occurs when the pulse returns before the echo is read
-        
+
     GPIO.output(TRIG, GPIO.HIGH)
     time.sleep(0.00001)
     GPIO.output(TRIG, GPIO.LOW)
@@ -192,25 +199,23 @@ def getDist(TRIG, ECHO):
 
 
 def captureNscare():
-    global NEED_TO_CAPTURE
-	
-    PATH_TO_ENDPOINT = ""
-	
-    if NEED_TO_CAPTURE:
         cam = cv2.VideoCapture(0)
         ret, frame = cam.read()
-        ret, buf = cv2.imencode('.jpg', frame)
+        ret, img_encoded = cv2.imencode('.jpg', frame)
         cam.release()
 
         response = requests.post('http://10.0.0.47:8080/image', data=img_encoded.tostring(), headers=headers)
 
-        change_LED(response.json['light'])
-        make_noise(response.json['sound'])
+        change_LED(response.json()['light'])
+        make_noise(response.json()['sound'])
 
 
 if __name__ == "__main__":
     initializeLEDs()
+    prevTime = time.time() - 5
 
     while True:
-        if getDist(rTRIG, rECHO) < 20 || getDist(lTRIG, LECHO) < 20:
+        curTime = time.time()
+        if curTime - prevTime > 5 and (getDist(rTRIG, rECHO) < 20 or getDist(lTRIG, lECHO) < 20):
+            prevTime = time.time()
             captureNscare()
