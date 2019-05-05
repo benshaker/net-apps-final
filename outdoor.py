@@ -121,17 +121,6 @@ def setLEDP():
     m.ChangeDutyCycle(100)
 
 
-def setLEDDisco():
-    # disco LED
-    p.ChangeDutyCycle(100)
-    w.ChangeDutyCycle(100)
-    m.ChangeDutyCycle(100)
-
-    p.ChangeFrequency(2)
-    w.ChangeFrequency(4)
-    m.ChangeFrequency(8)
-
-
 def setLEDOFF():
     # LED off entirely
     resetFrequency()
@@ -142,26 +131,24 @@ def setLEDOFF():
 
 def change_LED(COLOR):
 
-    if COLOR == 'White':
+    if COLOR == 'white':
         setLEDW()
-    elif COLOR == 'Red':
+    elif COLOR == 'red':
         setLEDR()
-    elif COLOR == 'Green':
+    elif COLOR == 'green':
         setLEDG()
-    elif COLOR == 'Blue':
+    elif COLOR == 'blue':
         setLEDB()
-    elif COLOR == 'Cyan':
+    elif COLOR == 'cyan':
         setLEDC()
-    elif COLOR == 'Magenta':
+    elif COLOR == 'magenta':
         setLEDM()
-    elif COLOR == 'Yellow':
+    elif COLOR == 'yellow':
         setLEDY()
-    elif COLOR == 'Orange':
+    elif COLOR == 'orange':
         setLEDO()
-    elif COLOR == 'Purple':
+    elif COLOR == 'purple':
         setLEDP()
-    elif COLOR == 'Disco':
-        setLEDDisco()
 
 
 def make_noise(SOUND):
