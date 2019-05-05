@@ -20,6 +20,7 @@ import jsonpickle
 import numpy as np
 import cv2
 import base64
+import re
 
 import time
 
@@ -30,7 +31,7 @@ app = Flask(__name__)
 sass.compile(dirname=('assets/scss', 'static/css'))
 # BEGIN APP
 
-IP = '127.0.0.1'
+IP = 'localhost'
 PORT = 8080
 
 @app.route("/")
@@ -155,7 +156,7 @@ def image_post():
 
     labels = []
     for annote in annotations:
-        labels.append({"label":annote['description'], "score":annote['score']})
+        labels.append(annote['description'].lower())
         # TODO determine action based on the animal found
 
     if falseAlarm:
@@ -180,11 +181,10 @@ def determineAction(labels):
     # using these lists to determine the action
     # recording the action in the History collection
 
-    nighttime = True
     mytime = time.localtime()
 
     if mytime.tm_hour < 6 or mytime.tm_hour > 18:
-        pass
+        nighttime = True
     else:
         nighttime = False
 
@@ -201,13 +201,21 @@ def determineAction(labels):
     response_daytime = settings[2]['response_daytime']
     response_nighttime = settings[3]['response_nighttime']
 
-    # return {"sound":"Grizzly.wav", "light":None}
-    # return {"sound":"Hawk.wav", "light":None}
-    # return {"sound":"Doggos.wav", "light":None}
-    # return {"sound":"Hooman.wav", "light":None}
-    return {"sound":None, "light":"Yellow"}
-    return {"sound":None, "light":None}
+    for item in whitelist:
+        if item in labels:
+            return {"sound" : None, "light" : None}
 
+    for item in blacklist:
+        if item in labels or (item + 's') in labels:
+            if nighttime:
+                return {"sound" : None, "light" : response_nighttime[item]}
+            else:
+                return {"sound" : response_daytime[item], "light" : None}
+
+    if nighttime:
+        return {"sound" : None, "light" : response_nighttime[default]}
+    else:
+        return {"sound" : response_daytime[default], "light" : None}
 
 
 # this is a helper function that handles blanket 404 errors
