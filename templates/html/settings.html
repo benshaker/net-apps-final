@@ -20,7 +20,7 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700|Source+Serif+Pro:700" rel="stylesheet">
 
         <!-- favicon.ico. Place these in the root directory. -->
-        <link rel="shortcut icon" href="favicon.ico">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
     </head>
 
@@ -34,22 +34,22 @@
             <br />
             <h3>Whitelist.</h3>
 			<p>Modify your whitelist below. These are creatures you wish for Deer 'B' Gone to ignore.</p>
-			<input class="form-control mb1" type="text" placeholder="Whitelist" id="white">
+			<input class="form-control mb1" type="text" placeholder="Whitelist" id="whitelist">
             <br>
 
 			<h3>Blacklist.</h3>
 			<p>These are creatures you wish to scare away from your garden. They deserve no mercy.</p>
-            <input class="form-control mb1" type="text" placeholder="Blacklist" id="black">
+            <input class="form-control mb1" type="text" placeholder="Blacklist" id="blacklist">
 			<br>
 
 			<h3>Daytime Responses.</h3> <!-- should be drop downs -->
 			<p>These are all sound-based responses to the animals on the blacklist. If none are specified, the default is "Get off my lawn".</p>
-            <input class="form-control mb1" type="text" placeholder="Daytime Responses" id="day">
+            <input class="form-control mb1" type="text" placeholder="Daytime Responses" id="daytime">
             <br>
 
 			<h3>Nighttime Responses.</h3> <!-- should be drop downs -->
 			<p>These are all light-based responses to the animals on the blacklist. If none are specified, the default is "Disco".</p>
-            <input class="form-control mb1" type="text" placeholder="Nighttime Responses"  id="night">
+            <input class="form-control mb1" type="text" placeholder="Nighttime Responses"  id="nighttime">
             <br>
 
             <button class="btn btn--default" id="save">
