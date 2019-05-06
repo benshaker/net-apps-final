@@ -70,21 +70,8 @@ def save_settings_put():
   settings = db.getSettings()
   operations = []
   for ob in r["data"]:
-    # name = ob.pop('name')
-    print(ob)
     settings.find_one_and_update({"name": ob['name']},
                                  {"$set": ob})
-    # settings.replace_one({'name':ob['name']},
-    #                              ob,
-    #                              True)
-
-  #   print(ob)
-  #   # print(type(json.loads(ob)))
-  #   operations.append(
-  #       UpdateOne({"name": name},
-  #             {"$set": ob})
-  #       )
-  # settings.bulk_write(operations)
 
   action = {"success":"woohoo!!1"}
   return make_response(jsonify(action), 200)
@@ -101,7 +88,7 @@ def load_history_get():
 def add_to_history(data):
     animal, time, sound, light = data
     history = db.getHistory()
-
+    #print(data)
     post = {
         "animal_detected": animal,
         "time_of_occurrence": time,
@@ -150,7 +137,6 @@ def image_post():
 
     falseAlarm = False
 
-    # handle the Canvas response
     if not json_res:
         return make_response(jsonify({
             'error': 'No file names matched your search term.'
@@ -168,58 +154,42 @@ def image_post():
     labels = []
     for annote in annotations:
         labels.append(annote['description'].lower())
-        # TODO determine action based on the animal found
 
     if falseAlarm:
+        # human // may be ignored
         action = {"sound":None, "light":None}
     else:
+        # not human // determine action
         action = determineAction(labels)
-    # print("HERE")
-    # print(action)
 
     return make_response(jsonify(action), 201)
 
 
 def determineAction(labels):
-    # to do:
-    # determine action to send to outdoor pi
-    #
-    # this requires
-    # determining the time of day
-    # pulling in the black & white lists
-    # pulling in day_responses, night_responses
-    #
-    # using these lists to determine the action
-    # recording the action in the History collection
 
     mytime = time.localtime()
-
+    time_date = time.strftime("%b %d %Y %H:%M:%S", mytime)
+    
     if mytime.tm_hour < 6 or mytime.tm_hour > 18:
-        nighttime = False
-    else:
         nighttime = True
+    else:
+        nighttime = False
 
     coll = db.getSettings()
     settings = coll.find({}, {'_id': False})
     settings = dumps(settings)
     settings = ast.literal_eval(settings)
-
-    # print(settings)
-    # print("settings")
-
-    whitelist = settings[0]['whitelist']
-    blacklist = settings[1]['blacklist']
-    response_daytime = settings[2]['daytime']
-    response_nighttime = settings[3]['nighttime']
-
-    print(whitelist)
-    print(blacklist)
-    print(response_daytime)
-    print(response_nighttime)
-    print("labels",labels)
-
-    # re.sub(r'\W+', '', whitelist)
-    # re.sub(r'\W+', '', blacklist)
+    
+    for ob in settings:
+        name = ob['name']
+        if name == "whitelist":
+            whitelist = ob[name]
+        elif name == "blacklist":
+            blacklist = ob[name]
+        elif name == "daytime":
+            daytime_responses = ob[name]
+        elif name == "nighttime":
+            nighttime_responses = ob[name]
 
     for item in whitelist:
         if item in labels:
@@ -232,19 +202,19 @@ def determineAction(labels):
             known_animal = True
             animal = item
             if nighttime:
-                action = {"sound" : None, "light" : response_nighttime[item]}
+                action = {"sound" : None, "light" : nighttime_responses[item]}
             else:
-                action = {"sound" : response_daytime[item], "light" : None}
+                action = {"sound" : daytime_responses[item], "light" : None}
 
     if not known_animal:
         item = "default"
         animal = item
         if nighttime:
-            action = {"sound" : None, "light" : response_nighttime[item]}
+            action = {"sound" : None, "light" : nighttime_responses[item]}
         elif not nighttime:
-            action = {"sound" : response_daytime[item], "light" : None}
+            action = {"sound" : daytime_responses[item], "light" : None}
 
-    event = animal, mytime, action["sound"], action["light"]
+    event = animal, time_date, action["sound"], action["light"]
     add_to_history(event)
 
     return action
