@@ -1,4 +1,4 @@
-(function() {
+$(document).ready(function() {
   window.onload=function(){
     const save_btn = document.getElementById("save");
     if(save_btn){
@@ -24,10 +24,12 @@
     };
   }
 
+
   var xhr = new XMLHttpRequest();
-  xhr.addEventListener("load", reqListener);
-  xhr.open("GET", "/load_settings");
-  xhr.send();
+  var xhr1 = new XMLHttpRequest();
+  xhr1.addEventListener("load", reqListener);
+  xhr1.open("GET", "/load_settings");
+  xhr1.send();
 
   function RespondClick() {
       whitelist = document.getElementById("whitelist").value.split(",");
@@ -45,9 +47,23 @@
 
       data = {'data': [whitelist, blacklist, daytime, nighttime]}
 
-      var xhr = new XMLHttpRequest();
+      
       xhr.open("PUT", "/save_settings");
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.send(JSON.stringify(data));
   }
-})();
+
+  xhr.onreadystatechange = function() {
+       if (xhr.readyState === 4) {
+        var response = JSON.parse(xhr.responseText);
+	console.log(response);
+        if (xhr.status === 200 && response.status === 'OK') {
+           $("#success-alert").show();
+	   setTimeout(function() { $("#success-alert").hide(); }, 2000);
+        } else {
+           $("#error-alert").show();
+	   setTimeout(function() { $("#error-alert").hide(); }, 2000);
+        }
+       }
+      }
+});
