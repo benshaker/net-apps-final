@@ -8,19 +8,29 @@
 
   function reqListener () {
     res_arr   = JSON.parse(this.responseText);
-    console.log(res_arr[0]["whitelist"])
-    console.log(res_arr[1]["blacklist"])
-    console.log(res_arr[2]["daytime"])
-    console.log(res_arr[3]["nighttime"])
-    whitelist = res_arr[0]["whitelist"];
-    blacklist = res_arr[1]["blacklist"];
-    daytime   = JSON.stringify(res_arr[2]["daytime"]);
-    nighttime = JSON.stringify(res_arr[3]["nighttime"]);
+    for (var i = res_arr.length - 1; i >= 0; i--) {
+      name = res_arr[i]["name"];
 
-    document.getElementById("white").value = whitelist;
-    document.getElementById("black").value = blacklist;
-    document.getElementById("day").value = daytime;
-    document.getElementById("night").value = nighttime;
+      if(name.includes('time')){
+        val = JSON.stringify(res_arr[i][name]);
+      }
+      else val = res_arr[i][name];
+
+      document.getElementById(name).value = val;
+    };
+    // console.log(res_arr[0]["whitelist"])
+    // console.log(res_arr[1]["blacklist"])
+    // console.log(res_arr[2]["daytime"])
+    // console.log(res_arr[3]["nighttime"])
+    // whitelist = res_arr[0]["whitelist"];
+    // blacklist = res_arr[1]["blacklist"];
+    // daytime   = JSON.stringify(res_arr[2]["daytime"]);
+    // nighttime = JSON.stringify(res_arr[3]["nighttime"]);
+
+    // document.getElementById("white").value = whitelist;
+    // document.getElementById("black").value = blacklist;
+    // document.getElementById("day").value = daytime;
+    // document.getElementById("night").value = nighttime;
   }
 
   var xhr = new XMLHttpRequest();
@@ -30,16 +40,16 @@
 
   function RespondClick() {
       whitelist = document.getElementById("white").value.split(",");
-      whitelist = {"whitelist":whitelist, "name":"white"}
+      whitelist = {"whitelist":whitelist, "name":"whitelist"}
       // console.log(whitelist)
       blacklist = document.getElementById("black").value.split(",");
-      blacklist = {"blacklist":blacklist, "name":"black"}
+      blacklist = {"blacklist":blacklist, "name":"blacklist"}
       // console.log(blacklist)
       daytime   = document.getElementById("day").value.split(",");
-      daytime = {"daytime":JSON.parse(daytime), "name":"day"}
+      daytime = {"daytime":JSON.parse(daytime), "name":"daytime"}
       // console.log(daytime)
       nighttime = document.getElementById("night").value.split(",");
-      nighttime = {"nighttime":JSON.parse(nighttime), "name":"night"}
+      nighttime = {"nighttime":JSON.parse(nighttime), "name":"nighttime"}
       // console.log(nighttime)
 
       data = {'data': [whitelist, blacklist, daytime, nighttime]}
