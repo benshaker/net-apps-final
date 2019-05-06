@@ -86,14 +86,15 @@ def load_history_get():
 	return make_response(hist, 201)
 
 def add_to_history(data):
-    animal, time, sound, light = data
+    animal, time, sound, light, img64 = data
     history = db.getHistory()
     #print(data)
     post = {
         "animal_detected": animal,
         "time_of_occurrence": time,
         "action_sound": sound,
-        "action_light": light
+        "action_light": light,
+        "image": img64
     }
 
     history.insert_one(post)
@@ -160,20 +161,22 @@ def image_post():
         action = {"sound":None, "light":None}
     else:
         # not human // determine action
-        action = determineAction(labels)
+        action = determineAction(labels, str(img_str))
 
     return make_response(jsonify(action), 201)
 
 
-def determineAction(labels):
+def determineAction(labels,img64):
 
     mytime = time.localtime()
     time_date = time.strftime("%b %d %Y %H:%M:%S", mytime)
     
     if mytime.tm_hour < 6 or mytime.tm_hour > 18:
         nighttime = True
+        time_date += " (Nighttime)"
     else:
         nighttime = False
+        time_date += " (Daytime)"
 
     coll = db.getSettings()
     settings = coll.find({}, {'_id': False})
@@ -214,7 +217,7 @@ def determineAction(labels):
         elif not nighttime:
             action = {"sound" : daytime_responses[item], "light" : None}
 
-    event = animal, time_date, action["sound"], action["light"]
+    event = animal, time_date, action["sound"], action["light"], img64
     add_to_history(event)
 
     return action
