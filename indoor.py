@@ -72,8 +72,8 @@ def save_settings_put():
   for ob in r["data"]:
     settings.find_one_and_update({"name": ob['name']},
                                  {"$set": ob})
-
-  action = {"success":"woohoo!!1"}
+                                 
+  action = {"success":"woohoo!!1", "status":'OK'}
   return make_response(jsonify(action), 200)
 
 
