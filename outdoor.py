@@ -155,7 +155,9 @@ def change_LED(COLOR):
     elif COLOR == 'purple':
         setLEDP()
 
-    time.sleep(5)
+    if COLOR != None:
+        time.sleep(5)
+
     setLEDOFF()
 
 
