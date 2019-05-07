@@ -45,19 +45,22 @@
 			<br>
 
 			<h3>Daytime Responses.</h3> <!-- should be drop downs -->
-			<p>These are all sound-based responses to the animals on the blacklist. If none are specified, the default is "Get Off My Lawn!".</p>
+			<p>Audio responses to the animals on the blacklist. If none are specified, the default is "Human".</p>
+            <p>Choose a sound clip: <i>["Baboon", "Camel", "CarAlarm", "Coyotoes", "Doggos", "Elephant", "Explosion", "Grizzly", "Hawk", "Human", "Hyenas", "Jaguar", "Kids", "PigFarm", "Rattlesnake", "Woohoo", "Yeehaw"]</i>
+            </p>
             <input class="form-control mb1" type="text" placeholder="Daytime Responses" id="daytime">
             <br>
 
 			<h3>Nighttime Responses.</h3> <!-- should be drop downs -->
-			<p>These are all light-based responses to the animals on the blacklist. If none are specified, the default is "white".</p>
+			<p>Visual responses to the animals on the blacklist. If none are specified, the default is "white".</p>
+            <p>Choose a light color: <i>["white", "red", "green", "blue", "cyan", "magenta", "yellow", "orange", "purple"].</i></p>
             <input class="form-control mb1" type="text" placeholder="Nighttime Responses"  id="nighttime">
             <br>
 
             <button class="btn btn--default" id="save">
                 Save Settings
             </button>
-	    
+
 	    <span class="alert alert-success" id="success-alert" style="display:none;float:right;">&#9989; Saved Successfully</span>
 	    <span class="alert alert-error" id="error-alert" style="display:none;float:right;">&#10060; Save Not Successful</span>
 
