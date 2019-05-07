@@ -163,7 +163,7 @@ def make_noise(SOUND):
 
     print("sound played:",SOUND)
     if SOUND != None:
-        os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp ' + SOUND + '.wav')
+        os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp audio/' + SOUND + '.wav')
 
 
 def getDist(TRIG, ECHO):
