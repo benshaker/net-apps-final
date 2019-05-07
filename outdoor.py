@@ -10,6 +10,7 @@ import RPi.GPIO as GPIO
 import time
 import requests
 import argparse
+import signal
 
 # Suppress Warnings
 GPIO.setwarnings(False)
@@ -192,20 +193,27 @@ def getDist(TRIG, ECHO):
 
 
 def captureNscare(iip):
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(-1)
         ret, frame = cam.read()
         ret, img_encoded = cv2.imencode('.jpg', frame)
         cam.release()
-
-        response = requests.post('http://'+iip+':8080/image', data=img_encoded.tostring(), headers=headers)
-
-        change_LED(response.json()['light'])
-        make_noise(response.json()['sound'])
+        try:
+            response = requests.post('http://'+iip+':8080/image', data=img_encoded.tostring(), headers=headers)
+            change_LED(response.json()['light'])
+            make_noise(response.json()['sound'])
+        except Exception:
+            print("Error: Service appears unavailable. Please try again.")
 
 
 if __name__ == "__main__":
     initializeLEDs()
     prevTime = time.time() - 5
+    
+    def signal_handler(signal, frame):
+        print("\n\nThe Outdoor Pi is shutting down.")
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     parser = argparse.ArgumentParser(description='Sends images, receives instructions, and scares animals..')
 
