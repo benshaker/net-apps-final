@@ -133,6 +133,8 @@ def setLEDOFF():
 
 
 def change_LED(COLOR):
+    
+    print("color displayed:",COLOR)
 
     if COLOR == 'white':
         setLEDW()
@@ -159,7 +161,7 @@ def change_LED(COLOR):
 
 def make_noise(SOUND):
 
-    print(SOUND)
+    print("sound played:",SOUND)
     if SOUND != None:
         os.system('aplay -q -D bluealsa:HCI=hci0,DEV=FC:58:FA:A6:22:95,PROFILE=a2dp ' + SOUND + '.wav')
 
@@ -201,6 +203,7 @@ def captureNscare(iip):
             response = requests.post('http://'+iip+':8080/image', data=img_encoded.tostring(), headers=headers)
             change_LED(response.json()['light'])
             make_noise(response.json()['sound'])
+            print("\n")
         except Exception:
             print("Error: Service appears unavailable. Please try again.")
 
