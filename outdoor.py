@@ -2,12 +2,14 @@
 # outdoor.py
 
 import os
+import sys
 import cv2
 import base64
 import numpy as np
 import RPi.GPIO as GPIO
 import time
 import requests
+import argparse
 
 # Suppress Warnings
 GPIO.setwarnings(False)
@@ -189,13 +191,13 @@ def getDist(TRIG, ECHO):
     return Dist
 
 
-def captureNscare():
+def captureNscare(iip):
         cam = cv2.VideoCapture(0)
         ret, frame = cam.read()
         ret, img_encoded = cv2.imencode('.jpg', frame)
         cam.release()
 
-        response = requests.post('http://10.0.0.47:8080/image', data=img_encoded.tostring(), headers=headers)
+        response = requests.post('http://'+iip+':8080/image', data=img_encoded.tostring(), headers=headers)
 
         change_LED(response.json()['light'])
         make_noise(response.json()['sound'])
@@ -205,8 +207,19 @@ if __name__ == "__main__":
     initializeLEDs()
     prevTime = time.time() - 5
 
+    parser = argparse.ArgumentParser(description='Sends images, receives instructions, and scares animals..')
+
+    parser.add_argument('--indoor_ip',
+                        '-iip',
+                        help="the IP to be POSTed to for animal detection & action retrieval",
+                        type=str,
+                        default="192.168.1.169")
+
+    args = parser.parse_args(sys.argv[1:])
+    iip = args.indoor_ip
+
     while True:
         curTime = time.time()
         if curTime - prevTime > 5 and (getDist(rTRIG, rECHO) < 20 or getDist(lTRIG, lECHO) < 20):
             prevTime = time.time()
-            captureNscare()
+            captureNscare(iip)
