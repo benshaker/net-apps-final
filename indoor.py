@@ -86,7 +86,7 @@ def load_history_get():
 	return make_response(hist, 201)
 
 def add_to_history(data):
-    animal, time, sound, light, img64 = data
+    animal, time, sound, light, labels, img64 = data
     history = db.getHistory()
     #print(data)
     post = {
@@ -94,6 +94,7 @@ def add_to_history(data):
         "time_of_occurrence": time,
         "action_sound": sound,
         "action_light": light,
+        "labels": labels,
         "image": img64
     }
 
@@ -200,14 +201,16 @@ def determineAction(labels,img64):
 
     known_animal = False
     animal = None
+    print(labels)
     for item in blacklist:
-        if item in labels or (item + 's') in labels:
-            known_animal = True
-            animal = item
-            if nighttime:
-                action = {"sound" : None, "light" : nighttime_responses[item]}
-            else:
-                action = {"sound" : daytime_responses[item], "light" : None}
+        for label in labels:
+            if item in label:
+                known_animal = True
+                animal = item
+                if nighttime:
+                    action = {"sound" : None, "light" : nighttime_responses[item]}
+                else:
+                    action = {"sound" : daytime_responses[item], "light" : None}
 
     if not known_animal:
         item = "default"
@@ -217,7 +220,7 @@ def determineAction(labels,img64):
         elif not nighttime:
             action = {"sound" : daytime_responses[item], "light" : None}
 
-    event = animal, time_date, action["sound"], action["light"], img64
+    event = animal, time_date, action["sound"], action["light"], labels, img64
     add_to_history(event)
 
     return action

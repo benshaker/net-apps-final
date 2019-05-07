@@ -8,17 +8,12 @@ $(document).ready(function() {
 
   function reqListener () {
     res_arr   = JSON.parse(this.responseText);
-    //console.log(res_arr);
     for (var i = 3; i >= 0; i--) {
       name = res_arr[i]["name"];
-      //console.log(res_arr[i]);
       if(name.includes('time')){
-	//console.log('true');
         val = JSON.stringify(res_arr[i][name]);
       }
       else val = res_arr[i][name];
-      //console.log(name);
-      //console.log(val);
 
       document.getElementById(name).value = val;
     };
@@ -32,18 +27,37 @@ $(document).ready(function() {
   xhr1.send();
 
   function RespondClick() {
-      whitelist = document.getElementById("whitelist").value.split(",");
-      whitelist = {"whitelist":whitelist, "name":"whitelist"}
-      // console.log(whitelist)
-      blacklist = document.getElementById("blacklist").value.split(",");
-      blacklist = {"blacklist":blacklist, "name":"blacklist"}
-      // console.log(blacklist)
+
+      whitelist_list = document.getElementById("whitelist").value.split(",");
+      whitelist = {"whitelist":whitelist_list, "name":"whitelist"}
+      blacklist_list = document.getElementById("blacklist").value.split(",");
+      blacklist = {"blacklist":blacklist_list, "name":"blacklist"}
       daytime   = document.getElementById("daytime").value.split(",");
-      daytime = {"daytime":JSON.parse(daytime), "name":"daytime"}
-      // console.log(daytime)
+      daytime_json = JSON.parse(daytime);
+      daytime = {"daytime":daytime_json, "name":"daytime"}
       nighttime = document.getElementById("nighttime").value.split(",");
-      nighttime = {"nighttime":JSON.parse(nighttime), "name":"nighttime"}
-      // console.log(nighttime)
+      nighttime_json = JSON.parse(nighttime);
+      nighttime = {"nighttime":nighttime_json, "name":"nighttime"}
+
+      for(var i = blacklist_list.length - 1; i >= 0; i --){
+	if (!(blacklist_list[i] in nighttime_json)){
+	  $("#error-alert").text("\u274c Missing Nighttime Response for \""+blacklist_list[i]+"\".");
+	  $("#error-alert").show();
+	  setTimeout(function() {
+		$("#error-alert").hide();
+		$("#error-alert").text("\u10060 Save Not Successful");
+		}, 4000)
+	  return false;
+	} else if (!(blacklist_list[i] in daytime_json)){
+	  $("#error-alert").text("\u274c Missing Daytime Response for \""+blacklist_list[i]+"\".");
+	  $("#error-alert").show();
+	  setTimeout(function() {
+		$("#error-alert").hide();
+		$("#error-alert").text("\u10060 Save Not Successful");
+		}, 4000)
+	  return false;
+	}
+      }
 
       data = {'data': [whitelist, blacklist, daytime, nighttime]}
 
@@ -56,11 +70,10 @@ $(document).ready(function() {
   xhr.onreadystatechange = function() {
        if (xhr.readyState === 4) {
         var response = JSON.parse(xhr.responseText);
-	console.log(response);
         if (xhr.status === 200 && response.status === 'OK') {
            $("#success-alert").show();
 	   setTimeout(function() { $("#success-alert").hide(); }, 2000);
-        } else {
+        } else {s
            $("#error-alert").show();
 	   setTimeout(function() { $("#error-alert").hide(); }, 2000);
         }
